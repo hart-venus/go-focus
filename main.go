@@ -61,7 +61,7 @@ func sendNotification(message string) {
 	notf.Push("Go Focus", message, "", notificator.UR_NORMAL)
 }
 
-func createTimer(seconds int) {
+func createTimer(seconds int, shouldPause bool) {
 	fullSeconds := seconds
 	ticker := time.NewTicker(time.Second * 1) // creating a 1 second ticker
 	done := make(chan bool)                   // channel to receive signal when to stop
@@ -70,7 +70,6 @@ func createTimer(seconds int) {
 		for {
 			select {
 			case <-done:
-				ticker.Stop()
 				return
 			case <-ticker.C:
 				seconds--
@@ -82,6 +81,12 @@ func createTimer(seconds int) {
 		}
 	}()
 	<-done // block here until we receive the done signal
+	ticker.Stop()
+	if shouldPause {
+		// wait for user input before continuing
+		fmt.Println("Press enter to continue...")
+		fmt.Scanln()
+	}
 }
 
 func displayTime(seconds int, percent float64) {
@@ -94,5 +99,5 @@ func displayTime(seconds int, percent float64) {
 func main() {
 	setUpNotification()
 	fmt.Println()
-	createTimer(3)
+	createTimer(3, true)
 }

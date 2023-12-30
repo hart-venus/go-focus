@@ -1,5 +1,5 @@
 # To-Do
-- [ ] Implement pausing between each timer
+- [X] Implement pausing between each timer
 - [X] Modularize timers 
 - [X] Make timer go forwards(technically backwards)
 - [X] Make timer use powerline symbols
