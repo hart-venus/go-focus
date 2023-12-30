@@ -14,11 +14,13 @@ func formatTime(seconds int) string {
 func main() {
 	// creating a 1 second ticker
 	ticker := time.NewTicker(time.Second * 1)
-	twentyfiveminutes := 3
+	twentyfiveminutes := 60 * 25
 
 	done := make(chan bool) // channel to receive signal when to stop
 	// every second, print "tick"
 	go func() { // create a goroutine to run this function
+		// startup
+		fmt.Println(formatTime(twentyfiveminutes))
 		for {
 			select {
 			case <-done:
@@ -26,6 +28,7 @@ func main() {
 				return
 			case <-ticker.C:
 				twentyfiveminutes--
+				fmt.Print("\033[A\033[2K") // clear the previous line
 				fmt.Println(formatTime(twentyfiveminutes))
 				if twentyfiveminutes == 0 {
 					done <- true
