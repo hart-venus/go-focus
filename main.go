@@ -37,9 +37,13 @@ func removeLastLine() {
 func getProgressBar(percent float64) string {
 	percent = 1 - percent // make it go from left to right
 	width := terminalWidth()
-	barWidth := width - 5 // 5 from time and 1 from space
+	barWidth := width - 7 // 5 from time and 1 from space
 	progressWidth := int(float64(barWidth) * percent)
-	return fmt.Sprintf("%s%s", strings.Repeat("=", progressWidth), strings.Repeat(" ", barWidth-progressWidth))
+	progressSide := strings.Repeat("\033[42m \033[0m", progressWidth)
+	if percent != 1 {
+		progressSide += "\033[32m\033[0m"
+	}
+	return fmt.Sprintf("%s%s", progressSide, strings.Repeat(" ", barWidth-progressWidth))
 }
 
 func setUpNotification() {
@@ -68,6 +72,7 @@ func main() {
 	go func() { // create a goroutine to run this function
 		// startup
 		fmt.Print(formatTime(twentyfiveminutes))
+		fmt.Print(" ")
 		fmt.Println(getProgressBar(float64(twentyfiveminutes) / (60)))
 		for {
 			select {
@@ -78,6 +83,7 @@ func main() {
 				removeLastLine()
 				twentyfiveminutes--
 				fmt.Print(formatTime(twentyfiveminutes))
+				fmt.Print(" ")
 				fmt.Println(getProgressBar(float64(twentyfiveminutes) / (60)))
 
 				if twentyfiveminutes == 0 {
