@@ -61,7 +61,7 @@ func sendNotification(message string) {
 	notf.Push("Go Focus", message, "", notificator.UR_NORMAL)
 }
 
-func createTimer(seconds int, shouldPause bool) {
+func createTimer(seconds int) {
 	fullSeconds := seconds
 	ticker := time.NewTicker(time.Second * 1) // creating a 1 second ticker
 	done := make(chan bool)                   // channel to receive signal when to stop
@@ -82,11 +82,6 @@ func createTimer(seconds int, shouldPause bool) {
 	}()
 	<-done // block here until we receive the done signal
 	ticker.Stop()
-	if shouldPause {
-		// wait for user input before continuing
-		fmt.Println("Press enter to continue...")
-		fmt.Scanln()
-	}
 }
 
 func displayTime(seconds int, percent float64) {
@@ -96,6 +91,11 @@ func displayTime(seconds int, percent float64) {
 	fmt.Println(getProgressBar(percent))
 }
 
+func pause() {
+	fmt.Println("Press enter to continue...")
+	fmt.Scanln()
+}
+
 func main() {
 	setUpNotification()
 	fmt.Println()
@@ -103,14 +103,36 @@ func main() {
 	longBreakLength := 2
 	pomodoroLength := 4
 	breaks := 0
+	breakinterval := 4
+
+	pauseAfterBreak := false
+	pauseAfterPomodoro := true
+
+	shortBreakMessage := "Time for a short break!"
+	longBreakMessage := "Time for a long break!"
+	pomodoroMessage := "Back to work!"
+
+	createTimer(pomodoroLength)
 	for {
-		createTimer(pomodoroLength, true)
-		if breaks == 3 {
+		if breaks == (breakinterval - 1) {
+			sendNotification(longBreakMessage)
+			if pauseAfterPomodoro {
+				pause()
+			}
 			breaks = 0
-			createTimer(longBreakLength, true)
+			createTimer(longBreakLength)
 		} else {
+			sendNotification(shortBreakMessage)
+			if pauseAfterPomodoro {
+				pause()
+			}
 			breaks++
-			createTimer(shortBreakLength, true)
+			createTimer(shortBreakLength)
 		}
+		sendNotification(pomodoroMessage)
+		if pauseAfterBreak {
+			pause()
+		}
+		createTimer(pomodoroLength)
 	}
 }

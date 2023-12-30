@@ -5,4 +5,4 @@
 - [X] Make timer use powerline symbols
 - [X] Full timer-break-long break cycle
 - [ ] Config file
-- [ ] System notifications
+- [X] System notifications
