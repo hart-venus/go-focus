@@ -61,37 +61,38 @@ func sendNotification(message string) {
 	notf.Push("Go Focus", message, "", notificator.UR_NORMAL)
 }
 
-func main() {
-	setUpNotification()
-	// creating a 1 second ticker
-	ticker := time.NewTicker(time.Second * 1)
-	twentyfiveminutes := 3
-
-	done := make(chan bool) // channel to receive signal when to stop
-	// every second, print "tick"
-	go func() { // create a goroutine to run this function
-		// startup
-		fmt.Print(formatTime(twentyfiveminutes))
-		fmt.Print(" ")
-		fmt.Println(getProgressBar(float64(twentyfiveminutes) / (60)))
+func createTimer(seconds int) {
+	fullSeconds := seconds
+	ticker := time.NewTicker(time.Second * 1) // creating a 1 second ticker
+	done := make(chan bool)                   // channel to receive signal when to stop
+	go func() {
+		displayTime(seconds, float64(seconds)/float64(fullSeconds))
 		for {
 			select {
 			case <-done:
 				ticker.Stop()
 				return
 			case <-ticker.C:
-				removeLastLine()
-				twentyfiveminutes--
-				fmt.Print(formatTime(twentyfiveminutes))
-				fmt.Print(" ")
-				fmt.Println(getProgressBar(float64(twentyfiveminutes) / (60)))
-
-				if twentyfiveminutes == 0 {
+				seconds--
+				displayTime(seconds, float64(seconds)/float64(fullSeconds))
+				if seconds == 0 {
 					done <- true
 				}
 			}
 		}
 	}()
-
 	<-done // block here until we receive the done signal
+}
+
+func displayTime(seconds int, percent float64) {
+	removeLastLine()
+	fmt.Print(formatTime(seconds))
+	fmt.Print(" ")
+	fmt.Println(getProgressBar(percent))
+}
+
+func main() {
+	setUpNotification()
+	fmt.Println()
+	createTimer(3)
 }

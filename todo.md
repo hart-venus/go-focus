@@ -1,8 +1,8 @@
 # To-Do
 - [ ] Implement pausing between each timer
-- [ ] Modularize timers 
+- [X] Modularize timers 
 - [X] Make timer go forwards(technically backwards)
-- [ ] Make timer use powerline symbols
+- [X] Make timer use powerline symbols
 - [ ] Full timer-break-long break cycle
 - [ ] Config file
 - [ ] System notifications
