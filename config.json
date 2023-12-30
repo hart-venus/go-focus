@@ -1,0 +1,10 @@
+{
+    "shortBreakLength": 2,
+    "pomodoroLength": 2,
+    "breakInterval": 4,
+    "pauseAfterPomodoro": false,
+    "pauseAfterBreak": false,
+    "shortBreakMessage": "Time for a short break!",
+    "longBreakMessage": "Time for a long break!",
+    "pomodoroMessage": "Back to work!"
+}

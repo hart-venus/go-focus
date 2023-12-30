@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -9,6 +10,49 @@ import (
 	"github.com/0xAX/notificator"
 	"golang.org/x/term"
 )
+
+type Config struct {
+	ShortBreakLength   int    `json:"shortBreakLength"`
+	LongBreakLength    int    `json:"longBreakLength"`
+	PomodoroLength     int    `json:"pomodoroLength"`
+	BreakInterval      int    `json:"breakInterval"`
+	PauseAfterBreak    bool   `json:"pauseAfterBreak"`
+	PauseAfterPomodoro bool   `json:"pauseAfterPomodoro"`
+	ShortBreakMessage  string `json:"shortBreakMessage"`
+	LongBreakMessage   string `json:"longBreakMessage"`
+	PomodoroMessage    string `json:"pomodoroMessage"`
+}
+
+var defaultConfig = Config{
+	ShortBreakLength:   (5 * 60),
+	LongBreakLength:    (15 * 60),
+	PomodoroLength:     (25 * 60),
+	BreakInterval:      4,
+	PauseAfterBreak:    false,
+	PauseAfterPomodoro: true,
+	ShortBreakMessage:  "Time for a short break!",
+	LongBreakMessage:   "Time for a long break!",
+	PomodoroMessage:    "Back to work!",
+}
+
+func loadConfig(path string) (Config, error) {
+	config := defaultConfig // set defaults
+	file, err := os.Open(path)
+	if err != nil {
+		// if file doesn't exist, just return the defaults
+		if os.IsNotExist(err) {
+			return config, nil
+		}
+		return config, err
+	}
+
+	// Unmarshal the JSON encoding of Config into config.
+	err = json.NewDecoder(file).Decode(&config)
+	if err != nil {
+		return config, err
+	}
+	return config, nil
+}
 
 func formatTime(seconds int) string {
 	minutes := seconds / 60
@@ -97,20 +141,29 @@ func pause() {
 }
 
 func main() {
+	// grab path from args
+	path := "config.json"
+	if len(os.Args) > 1 {
+		path = os.Args[1]
+	}
+	config, err := loadConfig(path)
+	if err != nil {
+		panic(err)
+	}
 	setUpNotification()
 	fmt.Println()
-	shortBreakLength := 3
-	longBreakLength := 2
-	pomodoroLength := 4
+	shortBreakLength := config.ShortBreakLength
+	longBreakLength := config.LongBreakLength
+	pomodoroLength := config.PomodoroLength
 	breaks := 0
-	breakinterval := 4
+	breakinterval := config.BreakInterval
 
-	pauseAfterBreak := false
-	pauseAfterPomodoro := true
+	pauseAfterBreak := config.PauseAfterBreak
+	pauseAfterPomodoro := config.PauseAfterPomodoro
 
-	shortBreakMessage := "Time for a short break!"
-	longBreakMessage := "Time for a long break!"
-	pomodoroMessage := "Back to work!"
+	shortBreakMessage := config.ShortBreakMessage
+	longBreakMessage := config.LongBreakMessage
+	pomodoroMessage := config.PomodoroMessage
 
 	createTimer(pomodoroLength)
 	for {
