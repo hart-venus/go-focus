@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/0xAX/notificator"
 	"golang.org/x/term"
 )
 
@@ -16,6 +17,7 @@ func formatTime(seconds int) string {
 }
 
 var terminalFd int = int(os.Stdout.Fd())
+var notf *notificator.Notificator
 
 func terminalWidth() int {
 	width, _, err := term.GetSize(terminalFd)
@@ -39,7 +41,19 @@ func getProgressBar(percent float64) string {
 	return fmt.Sprintf("[%s%s]", strings.Repeat("=", progressWidth), strings.Repeat(" ", barWidth-progressWidth))
 }
 
+func setUpNotification() {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	notf = notificator.New(notificator.Options{
+		AppName:     "go-focus",
+		DefaultIcon: dir + "/icon/default.png",
+	})
+}
+
 func main() {
+	setUpNotification()
 	// creating a 1 second ticker
 	ticker := time.NewTicker(time.Second * 1)
 	twentyfiveminutes := 60
