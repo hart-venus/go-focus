@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
+
+	"golang.org/x/term"
 )
 
 func formatTime(seconds int) string {
@@ -12,6 +15,18 @@ func formatTime(seconds int) string {
 }
 
 func main() {
+	// get width of terminal
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+
+	if err != nil {
+		panic(err)
+	}
+
+	// print a space to fill the terminal
+	for i := 0; i < width; i++ {
+		fmt.Print(" ")
+	}
+
 	// creating a 1 second ticker
 	ticker := time.NewTicker(time.Second * 1)
 	twentyfiveminutes := 60 * 25
