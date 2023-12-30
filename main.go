@@ -99,5 +99,18 @@ func displayTime(seconds int, percent float64) {
 func main() {
 	setUpNotification()
 	fmt.Println()
-	createTimer(3, true)
+	shortBreakLength := 3
+	longBreakLength := 2
+	pomodoroLength := 4
+	breaks := 0
+	for {
+		createTimer(pomodoroLength, true)
+		if breaks == 3 {
+			breaks = 0
+			createTimer(longBreakLength, true)
+		} else {
+			breaks++
+			createTimer(shortBreakLength, true)
+		}
+	}
 }
