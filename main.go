@@ -35,10 +35,11 @@ func removeLastLine() {
 }
 
 func getProgressBar(percent float64) string {
+	percent = 1 - percent // make it go from left to right
 	width := terminalWidth()
-	barWidth := width - 7 // 5 from time and 1 from space
+	barWidth := width - 5 // 5 from time and 1 from space
 	progressWidth := int(float64(barWidth) * percent)
-	return fmt.Sprintf("[%s%s]", strings.Repeat("=", progressWidth), strings.Repeat(" ", barWidth-progressWidth))
+	return fmt.Sprintf("%s%s", strings.Repeat("=", progressWidth), strings.Repeat(" ", barWidth-progressWidth))
 }
 
 func setUpNotification() {
@@ -52,11 +53,15 @@ func setUpNotification() {
 	})
 }
 
+func sendNotification(message string) {
+	notf.Push("Go Focus", message, "", notificator.UR_NORMAL)
+}
+
 func main() {
 	setUpNotification()
 	// creating a 1 second ticker
 	ticker := time.NewTicker(time.Second * 1)
-	twentyfiveminutes := 60
+	twentyfiveminutes := 3
 
 	done := make(chan bool) // channel to receive signal when to stop
 	// every second, print "tick"
